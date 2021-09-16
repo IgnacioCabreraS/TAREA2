@@ -10,35 +10,32 @@
 typedef struct{
     const char * nombre;
     const char * marca;
-    char sector[20];
+    const char * sector;
     int stock;
     int precio;
 }Producto;
 
-/*
-    typedef struct{
-        char* marca;
-        char* sector[20];
-        int stock;
-        int precio;
-    }infoProducto
-
-    typedef struct{
-        char* nombre;
-        infoProducto* info;
-    }Producto
-*/
-
-/*
-    crear mapas de nombre, marca, sector.
-
-    preguntarle a la come gato. 
-    corte flaitiano maximus la ql.
-*/
 typedef struct{
     const char * nombreCarro;
     int cantidadProductos;
 }carroCompras;
+
+/*
+typedef struct{
+    char* marca;
+    char* sector[20];
+    int stock;
+    int precio;
+}infoProducto;
+
+typedef struct{
+    char* nombre;
+    infoProducto * info;
+}Producto;
+*/
+
+
+
 
 char*get_csv_field (char * tmp, int k){
     int open_mark = 0;
@@ -75,30 +72,98 @@ char*get_csv_field (char * tmp, int k){
 
 
 
-Map * cargar(FILE * file, Map* mapa){
+Map * cargar(FILE * file){
     char lineaArchivo[1024];
     int i;
     int cont = 0;
+
+    // crear mapas
+    
+    Map* mapaNombre = createMap(is_equal_int);
+    Map* mapaMarca = createMap(is_equal_int);
+    Map* mapaSector = createMap(is_equal_int);
+
     while (fgets (lineaArchivo, 1024, file) != NULL) {
-        Producto * cositas = (Producto*) malloc (sizeof(Producto));
+        Producto * productos = (Producto*) malloc (sizeof(Producto));
+        
         for(i = 0; i <= 4; i++){
             const char *aux = get_csv_field(lineaArchivo, i);
-            if(i == 0){
-                cositas->nombre = (char *)aux;
-                printf("%s\n", cositas->nombre);
-            } 
-            if(i == 1) cositas->marca = (char *)aux;
-            if(i == 2) cositas->sector[i] = (char *)aux;
-            if(i == 3) cositas->stock = (char *)aux;  
-            if(i == 4) cositas->precio = (char *)aux;
-        }
 
-        insertMap(mapa, cositas->nombre, cositas);
+            if(i==0){
+                productos->nombre = (char *)aux;
+                
+            }
+            
+            if(i==1){
+                productos->marca = (char *)aux;
+                printf("%s", productos->marca);
+            }
+            
+            if(i==2){
+                productos->sector = (char *)aux;
+            }
+            
+            if(i==3){
+                productos->stock = (char *)aux;
+            }
+
+            if(i==4){
+                productos->precio = (char *)aux;
+            }   
+        }
+        
+        // insert mapas
+
+        insertMap(mapaNombre, productos->nombre, productos);
+        insertMap(mapaMarca, productos->marca, productos);
+        insertMap(mapaSector, productos->sector, productos);
+
+    
         cont++; 
         if(cont == 100) break;
     } 
+    muestrePapito(mapaMarca);
 }
 
+void muestrePapito(Map* mapaSector){
+
+    /*
+    printf("Libros ordeandos por nombre:\n");
+    b = firstMap(books_by_title);
+    while (b) {
+        printf("%s (%d)\n", b->title, b->year);
+        b = nextMap(books_by_title);
+    }
+    */
+    printf("Recorriendo el mapa: \n");
+    Producto * wea = firstMap(mapaSector);
+    printf("%s \n", wea->nombre);
+    printf("%s \n", wea->marca);
+    printf("%s \n", wea->sector);
+    printf("%d \n", wea->stock);
+    /*
+    while(mapaSector){
+
+        printf("%s \n", wea->sector);
+        nextMap(mapaSector);
+    }
+    */
+
+    
+    
+}
+//void agregar_Produto(char[] nombre, char[] marca, char [] tipo, int stock int precio){
+    /*
+    int cont = 0; //contador 
+    
+    for  (i= 0  ; i< stock ; i++){ // recorrer 
+            
+
+     cont++:   
+    }
+
+    */
+//}
 int is_equal_int(void * key1, void * key2) {
     if(*(int*)key1 == *(int*)key2) return 1;
     return 0;
@@ -114,15 +179,13 @@ Map * importar(){
       strcat(archivo, ".csv"); 
       file  = fopen(archivo, "r");
     }while(!file);
-    Map * mapa = createMap(is_equal_int);
-    cargar(file,mapa);
+    cargar(file);
     fclose(file);
-    return mapa;
 }
 
 int main(){
 
-    Map* mapa = importar();
+    importar();
 
     int opcion=1;
     printf("============== SUPERMERCADO =============\n");
