@@ -15,6 +15,26 @@ typedef struct{
     int precio;
 }Producto;
 
+/*
+    typedef struct{
+        char* marca;
+        char* sector[20];
+        int stock;
+        int precio;
+    }infoProducto
+
+    typedef struct{
+        char* nombre;
+        infoProducto* info;
+    }Producto
+*/
+
+/*
+    crear mapas de nombre, marca, sector.
+
+    preguntarle a la come gato. 
+    corte flaitiano maximus la ql.
+*/
 typedef struct{
     const char * nombreCarro;
     int cantidadProductos;
@@ -53,6 +73,8 @@ char*get_csv_field (char * tmp, int k){
     return NULL;
 }
 
+
+
 Map * cargar(FILE * file, Map* mapa){
     char lineaArchivo[1024];
     int i;
@@ -60,7 +82,7 @@ Map * cargar(FILE * file, Map* mapa){
     while (fgets (lineaArchivo, 1024, file) != NULL) {
         Producto * cositas = (Producto*) malloc (sizeof(Producto));
         for(i = 0; i <= 4; i++){
-            const char *aux = get_csv_field(lineaArchivo, i); // Se obtiene el nombre
+            const char *aux = get_csv_field(lineaArchivo, i);
             if(i == 0){
                 cositas->nombre = (char *)aux;
                 printf("%s\n", cositas->nombre);
