@@ -53,14 +53,55 @@ char*get_csv_field (char * tmp, int k){
     return NULL;
 }
 
+Map * cargar(FILE * file, Map* mapa){
+    char lineaArchivo[1024];
+    int i;
+    int cont = 0;
+    while (fgets (lineaArchivo, 1024, file) != NULL) {
+        Producto * cositas = (Producto*) malloc (sizeof(Producto));
+        for(i = 0; i <= 4; i++){
+            const char *aux = get_csv_field(lineaArchivo, i); // Se obtiene el nombre
+            if(i == 0){
+                cositas->nombre = (char *)aux;
+                printf("%s\n", cositas->nombre);
+            } 
+            if(i == 1) cositas->marca = (char *)aux;
+            if(i == 2) cositas->sector[i] = (char *)aux;
+            if(i == 3) cositas->stock = (char *)aux;  
+            if(i == 4) cositas->precio = (char *)aux;
+        }
+
+        insertMap(mapa, cositas->nombre, cositas);
+        cont++; 
+        if(cont == 100) break;
+    } 
+}
+
 int is_equal_int(void * key1, void * key2) {
     if(*(int*)key1 == *(int*)key2) return 1;
     return 0;
 }
 
+Map * importar(){
+    char archivo[101];
+    FILE *file;
+
+    do{
+      printf("Ingresar nombre archivo: ");
+      scanf("%s", &archivo);
+      strcat(archivo, ".csv"); 
+      file  = fopen(archivo, "r");
+    }while(!file);
+    Map * mapa = createMap(is_equal_int);
+    cargar(file,mapa);
+    fclose(file);
+    return mapa;
+}
+
 int main(){
 
-    Map * mapa = createMap(is_equal_int);
+    Map* mapa = importar();
+
     int opcion=1;
     printf("============== SUPERMERCADO =============\n");
 
