@@ -1,6 +1,6 @@
-#include "Map.h"
 #include <stdlib.h>
 #include <assert.h>
+#include "Map.h"
 
 typedef struct Node Node;
 
@@ -229,5 +229,3 @@ void * eraseMap(Map * list, void * key) {
 
     return data;
 }
-
-
