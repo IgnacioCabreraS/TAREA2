@@ -34,8 +34,15 @@ typedef struct{
 }Producto;
 */
 
+int is_equal_int(void * key1, void * key2) {
+    if(*(int*)key1 == *(int*)key2) return 1;
+    return 0;
+}
 
-
+int is_equal_string(void * key1, void * key2) {
+    if(strcmp((char*)key1, (char*)key2)==0) return 1;
+    return 0;
+}
 
 char*get_csv_field (char * tmp, int k){
     int open_mark = 0;
@@ -79,9 +86,9 @@ Map * cargar(FILE * file){
 
     // crear mapas
     
-    Map* mapaNombre = createMap(is_equal_int);
-    Map* mapaMarca = createMap(is_equal_int);
-    Map* mapaSector = createMap(is_equal_int);
+    Map* mapaNombre = createMap(is_equal_string);
+    Map* mapaMarca = createMap(is_equal_string);
+    Map* mapaSector = createMap(is_equal_string);
 
     while (fgets (lineaArchivo, 1024, file) != NULL) {
         Producto * productos = (Producto*) malloc (sizeof(Producto));
@@ -96,7 +103,7 @@ Map * cargar(FILE * file){
             
             if(i==1){
                 productos->marca = (char *)aux;
-                printf("%s", productos->marca);
+                printf("%s \n", productos->marca);
             }
             
             if(i==2){
@@ -164,10 +171,7 @@ void muestrePapito(Map* mapaSector){
 
     */
 //}
-int is_equal_int(void * key1, void * key2) {
-    if(*(int*)key1 == *(int*)key2) return 1;
-    return 0;
-}
+
 
 Map * importar(){
     char archivo[101];
