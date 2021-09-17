@@ -44,15 +44,6 @@ int is_equal_string(void * key1, void * key2) {
     return 0;
 }
 
-int conversorInt(const char * cadena){
-    int i=cadena[0]-'0';
-    if(cadena[1]-'0'>=0){
-        i=i*10;
-        i+=cadena[1]-'0';
-    }
-    return i;
-}
-
 char*get_csv_field (char * tmp, int k){
     int open_mark = 0;
     char* ret=(char*) malloc(100*sizeof(char));
@@ -92,7 +83,6 @@ Map * cargar(FILE * file, Map * mapa){
     char lineaArchivo[1024];
     int i;
     int cont = 0;
-    int auxilio;
 
     while (fgets (lineaArchivo, 1024, file) != NULL) {
         Producto * productos = (Producto*) malloc (sizeof(Producto));
@@ -113,13 +103,11 @@ Map * cargar(FILE * file, Map * mapa){
             }
             
             if(i==3){
-                auxilio = conversorInt(aux);
-                productos->stock = auxilio;
+                productos->stock = atoi(aux);
             }
 
             if(i==4){
-                auxilio = conversorInt(aux);
-                productos->precio = auxilio;
+                productos->precio = atoi(aux);
             }   
         }
         
