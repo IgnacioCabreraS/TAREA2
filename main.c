@@ -9,7 +9,7 @@
 
 typedef struct{
     const char * nombre;
-    char * marca;
+    const char * marca;
     const char * sector;
     int stock;
     int precio;
@@ -20,11 +20,11 @@ typedef struct{
     int cantidadProductos;
 }carroCompras;
 
-/*
+/*/////
 typedef struct{
     char* marca;
     char* sector[20];
-    int stock;
+    int stock;66
     int precio;
 }infoProducto;
 
@@ -32,7 +32,7 @@ typedef struct{
     char* nombre;
     infoProducto * info;
 }Producto;
-*/
+*//////
 
 int is_equal_int(void * key1, void * key2) {
     if(*(int*)key1 == *(int*)key2) return 1;
@@ -42,6 +42,15 @@ int is_equal_int(void * key1, void * key2) {
 int is_equal_string(void * key1, void * key2) {
     if(strcmp((char*)key1, (char*)key2)==0) return 1;
     return 0;
+}
+
+int conversorInt(char * cadena){
+    int i=cadena[0]-'0';
+    if(cadena[1]-'0'>=0){
+        i=i*10;
+        i+=cadena[1]-'0';
+    }
+    return i;
 }
 
 char*get_csv_field (char * tmp, int k){
@@ -83,12 +92,13 @@ Map * cargar(FILE * file, Map * mapa){
     char lineaArchivo[1024];
     int i;
     int cont = 0;
+    int auxilio;
 
     while (fgets (lineaArchivo, 1024, file) != NULL) {
         Producto * productos = (Producto*) malloc (sizeof(Producto));
         
         for(i = 0; i <= 4; i++){
-            const char *aux = get_csv_field(lineaArchivo, i);
+            const char * aux = get_csv_field(lineaArchivo, i);
 
             if(i==0){
                 productos->nombre = (char *)aux;
@@ -103,11 +113,13 @@ Map * cargar(FILE * file, Map * mapa){
             }
             
             if(i==3){
-                productos->stock = (char *)aux;
+                auxilio = conversorInt(aux);
+                productos->stock = auxilio;
             }
 
             if(i==4){
-                productos->precio = (char *)aux;
+                auxilio = conversorInt(aux);
+                productos->precio = auxilio;
             }   
         }
         
@@ -122,9 +134,56 @@ Map * cargar(FILE * file, Map * mapa){
 
 void agregar(Map * map){
 
+    Producto * P = (Producto*)malloc(sizeof(Producto));
+    // entrada de datos;
+    char * nombre = (char*) malloc(30*sizeof(char));
+    printf("Ingrese el nombre del producto : ");
+    scanf(" %[^\n]s]", nombre);
+    
+    P = searchMap(map,nombre);
+    if(P){
+        printf("Este producto ya existe, aumentando stock.\n"); 
+        (P->stock)++;
+
+    }
+    else{
+        
+        P = firstMap(map);
+    
+        printf("Este producto no existe, agregue datos.\n"); 
+
+        char * marca = (char*) malloc(30*sizeof(char));
+        printf("Marca: ");
+        scanf(" %[^\n]s]", marca);
+        
+
+        char * sector = (char*) malloc(30*sizeof(char));
+        printf("Sector: ");
+        scanf(" %[^\n]s]", sector);
+        
+        
+        int precio;
+        printf("Precio: ");
+        scanf("%d", &precio);
+        
+        /*
+        P->nombre = nombre;
+        P->marca = marca;
+        P->sector = sector;
+        P->precio = precio;
+        P->stock = 1;¨
+        */
+        printf("Producto agregado. \n");
+        
+    }
+
 }
+/*
+void  producto_marca (Map * map){
 
 
+}
+*/
 void buscarNombre(Map * map){
 
     char * nombre = (char*) malloc(70*sizeof(char));
@@ -149,8 +208,8 @@ void mostrarTodo(Map* map){
         printf("%s ,", P->nombre);
         printf("%s ,", P->marca);
         printf("%s ,", P->sector);
-        printf("%s ,", P->stock);
-        printf("%s \n", P->precio);
+        printf("%d ,", P->stock);
+        printf("%d \n", P->precio);
         P = nextMap(map);
     }
 }
@@ -192,13 +251,12 @@ int main(){
         switch(opcion){
             case 1:buscarNombre(map);break;
             case 2:mostrarTodo(map);break;
-            case 3:printf("NO HECHA.\n");break;
+            case 3:agregar(map);break;
             case 4:printf("NO HECHA.\n");break;
             case 5:printf("NO HECHA.\n");break;
             case 6:printf("NO HECHA.\n");break;
             case 7:printf("NO HECHA.\n");break;
         }
-
     }
     return 0;
 }
