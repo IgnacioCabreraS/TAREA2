@@ -148,8 +148,8 @@ void agregar(Map * map){
     }
     else{
         
-        P = firstMap(map);
-    
+        Producto *nuevoP = (Producto *) malloc (sizeof (Producto));
+
         printf("Este producto no existe, agregue datos.\n"); 
 
         char * marca = (char*) malloc(30*sizeof(char));
@@ -166,13 +166,14 @@ void agregar(Map * map){
         printf("Precio: ");
         scanf("%d", &precio);
         
-        /*
-        P->nombre = nombre;
-        P->marca = marca;
-        P->sector = sector;
-        P->precio = precio;
-        P->stock = 1;¨
-        */
+        nuevoP->nombre = nombre;
+        nuevoP->marca = marca;
+        nuevoP->sector = sector;
+        nuevoP->precio = precio;
+        nuevoP->stock = 1;
+
+        insertMap (map, (void *) nuevoP -> nombre, nuevoP);
+
         printf("Producto agregado. \n");
         
     }
