@@ -120,6 +120,11 @@ Map * cargar(FILE * file, Map * mapa){
     
 }
 
+void agregar(Map * map){
+
+}
+
+
 void buscarNombre(Map * map){
 
     char * nombre = (char*) malloc(70*sizeof(char));
@@ -136,19 +141,19 @@ void buscarNombre(Map * map){
     
 }
 
-//void agregar_Produto(char[] nombre, char[] marca, char [] tipo, int stock int precio){
-    /*
-    int cont = 0; //contador 
-    
-    for  (i= 0  ; i< stock ; i++){ // recorrer 
-            
+void mostrarTodo(Map* map){
 
-     cont++:   
+    Producto *P = firstMap(map);
+
+    while(P){
+        printf("%s ,", P->nombre);
+        printf("%s ,", P->marca);
+        printf("%s ,", P->sector);
+        printf("%s ,", P->stock);
+        printf("%s \n", P->precio);
+        P = nextMap(map);
     }
-
-    */
-//}
-
+}
 
 Map * importar(){
     char archivo[101];
@@ -186,7 +191,7 @@ int main(){
 
         switch(opcion){
             case 1:buscarNombre(map);break;
-            case 2:printf("NO HECHA.\n");break;
+            case 2:mostrarTodo(map);break;
             case 3:printf("NO HECHA.\n");break;
             case 4:printf("NO HECHA.\n");break;
             case 5:printf("NO HECHA.\n");break;
