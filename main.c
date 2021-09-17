@@ -44,7 +44,7 @@ int is_equal_string(void * key1, void * key2) {
     return 0;
 }
 
-int conversorInt(char * cadena){
+int conversorInt(const char * cadena){
     int i=cadena[0]-'0';
     if(cadena[1]-'0'>=0){
         i=i*10;
@@ -124,7 +124,7 @@ Map * cargar(FILE * file, Map * mapa){
         }
         
         // insert mapas
-        insertMap(mapa, productos->nombre, productos);
+        insertMap(mapa, (void *) productos->nombre, productos);
 
         cont++; 
         if(cont == 100) break;
@@ -249,11 +249,11 @@ int main(){
         scanf("%d",&opcion);
 
         switch(opcion){
-            case 1:buscarNombre(map);break;
-            case 2:mostrarTodo(map);break;
-            case 3:agregar(map);break;
-            case 4:printf("NO HECHA.\n");break;
-            case 5:printf("NO HECHA.\n");break;
+            case 1:agregar(map);break;
+            case 2:printf("NO HECHA.\n");break;
+            case 3:printf("NO HECHA.\n");break;
+            case 4:buscarNombre(map);break;
+            case 5:mostrarTodo(map);break;
             case 6:printf("NO HECHA.\n");break;
             case 7:printf("NO HECHA.\n");break;
         }
