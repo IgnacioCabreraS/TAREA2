@@ -6,8 +6,6 @@
 #include "map.h"
 #include "list.h"
 
-//Mapa de marca, key = marca del producto, value = Lista con nombres de productos con esa marca.
-
 typedef struct{
     const char * nombre;
     const char * marca;
@@ -17,28 +15,11 @@ typedef struct{
 }Producto;
 
 typedef struct{
-    const char * nombreMarca;
-    List * listaMarcas;
-}Marcas;
-
-typedef struct{
     const char * nombreCarro;
     int cantidadProductos;
 }carroCompras;
 
-/*/////
-typedef struct{
-    char* marca;
-    char* sector[20];
-    int stock;66
-    int precio;
-}infoProducto;
 
-typedef struct{
-    char* nombre;
-    infoProducto * info;
-}Producto;
-*//////
 
 int is_equal_int(void * key1, void * key2) {
     if(*(int*)key1 == *(int*)key2) return 1;
@@ -132,26 +113,28 @@ Map * cargarPorMarca(FILE * file, Map * mapa){
     int cont = 0;
 
     while (fgets (lineaArchivo, 1024, file) != NULL) {
-        const char * marcaNueva;
+        Producto * producto = (Producto*)malloc(sizeof(Producto));
         
         for(i = 0; i <= 4; i++){
             const char * aux = get_csv_field(lineaArchivo, i);
             if(i == 1){
-                const char * M;
-                marcaNueva = (char*) aux;
                 
-                M = searchMap(mapa,marcaNueva);
+                const char * M;
+                char * marcaEntrante = (char*) aux;
+                M = searchMap(mapa,marcaEntrante);
+                
                 if(M == NULL){
-                    List * lista = createList();
-                    const char * nombre = get_csv_field(lineaArchivo, 0);
-                    printf("%s \n", marcaNueva);
-                    pushFront(lista,nombre);
-                    insertMap(mapa,marcaNueva,lista);
-                    
+                    List * listaMarcas = createList();
+                    producto->nombre = get_csv_field(lineaArchivo, 0);
+                    printf("%s \n", marcaEntrante);
+                    pushFront(listaMarcas,producto);
+                    insertMap(mapa,marcaEntrante,listaMarcas);
                 }
                 else{
-                    const char * nombre = get_csv_field(lineaArchivo, 0);
-                    
+                    //printf("SE REPITE MARCA \n");
+                    List * L = (List*)searchMap(mapa,marcaEntrante);
+                    producto->nombre = get_csv_field(lineaArchivo, 0);
+                    pushFront(L,producto);
                 }
             }
         }
@@ -160,19 +143,30 @@ Map * cargarPorMarca(FILE * file, Map * mapa){
         cont++; 
         if(cont == 100) break;
     } 
-    //mostrarVolas(mapa);
+    
 }
 
-/*
-void mostrarVolas(Map * map){
-    const char * marcaNueva;
-    marcaNueva = firstMap(map);
-    while(marcaNueva != NULL){
-        printf("%s \n", marcaNueva);
-        marcaNueva = nextMap(map);
-    }
+void buscarPorMarca(Map * mapMarcas){
 
-}*/
+    char * nombre = (char*) malloc(70*sizeof(char));
+    printf("Ingrese la marca del producto : ");
+    scanf(" %[^\n]s]", nombre);
+    List * L;
+    L = searchMap(mapMarcas,nombre);
+    if(L){
+        Producto * P = firstList(L);
+        while(P != NULL){
+            printf("%s \n", P->nombre);
+            P = nextList(L);
+            if(!L)break;
+        }
+    }
+    else{
+        printf("No existe este producto.\n");
+    }
+    
+    
+}
 
 void agregar(Map * map){
 
@@ -308,7 +302,7 @@ int main(){
         switch(opcion){
             case 1:agregar(map);break;
             case 2:printf("NO HECHA.\n");break;
-            case 3:printf("NO HECHA.\n");break;
+            case 3:buscarPorMarca(map2);break;
             case 4:buscarNombre(map);break;
             case 5:mostrarTodo(map);break;
             case 6:printf("NO HECHA.\n");break;
