@@ -126,7 +126,7 @@ Map * cargarPorMarca(FILE * file, Map * mapa){
                 if(M == NULL){
                     List * listaMarcas = createList();
                     producto->nombre = get_csv_field(lineaArchivo, 0);
-                    printf("%s \n", marcaEntrante);
+                    //printf("%s \n", marcaEntrante);
                     pushFront(listaMarcas,producto);
                     insertMap(mapa,marcaEntrante,listaMarcas);
                 }
@@ -143,6 +143,66 @@ Map * cargarPorMarca(FILE * file, Map * mapa){
         cont++; 
         if(cont == 100) break;
     } 
+    
+}
+
+Map * cargarPorTipo(FILE * file, Map * map){
+    char lineaArchivo[1024];
+    int i;
+    int cont = 0;
+
+    while (fgets (lineaArchivo, 1024, file) != NULL) {
+        Producto * producto = (Producto*)malloc(sizeof(Producto));
+        
+        for(i = 0; i <= 4; i++){
+            const char * aux = get_csv_field(lineaArchivo, i);
+            if(i == 2){
+                
+                const char * M;
+                char * sectorEntrante = (char*) aux;
+                M = searchMap(map,sectorEntrante);
+                
+                if(M == NULL){
+                    List * listaSector = createList();
+                    producto->nombre = get_csv_field(lineaArchivo, 0);
+                    //printf("%s \n", marcaEntrante);
+                    pushFront(listaSector,producto);
+                    insertMap(map,sectorEntrante,listaSector);
+                }
+                else{
+                    //printf("SE REPITE MARCA \n");
+                    List * L = (List*)searchMap(map,sectorEntrante);
+                    producto->nombre = get_csv_field(lineaArchivo, 0);
+                    pushFront(L,producto);
+                }
+            }
+        }
+        cont++; 
+        if(cont == 100) break;
+    } 
+    
+}
+
+void buscarPorTipo(Map * mapTipo){
+
+    char * nombre = (char*) malloc(70*sizeof(char));
+    printf("Ingrese el tipo de producto deseado : ");
+    scanf(" %[^\n]s]", nombre);
+    List * L;
+    L = searchMap(mapTipo,nombre);
+
+    if(L){
+        Producto * P = firstList(L);
+        while(P != NULL){
+            printf("%s \n", P->nombre);
+            P = nextList(L);
+            if(!L)break;
+        }
+    }
+    else{
+        printf("No existe este producto.\n");
+    }
+    
     
 }
 
@@ -278,12 +338,30 @@ Map * importarPorMarca(){
     return mapa;
 }
 
-int main(){
-    Map * map;
-    Map * map2;
+Map * importarPorTipo(){
+    char archivo[101];
+    FILE *file;
 
-    map = importarPorNombre();
-    map2 = importarPorMarca();
+    do{
+      printf("Ingresar nombre archivo: ");
+      scanf("%s", &archivo);
+      strcat(archivo, ".csv"); 
+      file  = fopen(archivo, "r");
+    }while(!file);
+    Map* mapa = createMap(is_equal_string);
+    cargarPorTipo(file,mapa);
+    fclose(file);
+    return mapa;
+}
+
+int main(){
+    Map * mapaPorNombre;
+    Map * mapaPorMarca;
+    Map * mapaPorTipo;
+
+    mapaPorNombre = importarPorNombre();
+    mapaPorMarca = importarPorMarca();
+    mapaPorTipo = importarPorTipo();
 
     int opcion=1;
     printf("============== SUPERMERCADO MAYORISTA 11 =============\n");
@@ -300,11 +378,11 @@ int main(){
         scanf("%d",&opcion);
 
         switch(opcion){
-            case 1:agregar(map);break;
-            case 2:printf("NO HECHA.\n");break;
-            case 3:buscarPorMarca(map2);break;
-            case 4:buscarNombre(map);break;
-            case 5:mostrarTodo(map);break;
+            case 1:agregar(mapaPorNombre);break;
+            case 2:buscarPorTipo(mapaPorTipo);break;
+            case 3:buscarPorMarca(mapaPorMarca);break;
+            case 4:buscarNombre(mapaPorNombre);break;
+            case 5:mostrarTodo(mapaPorNombre);break;
             case 6:printf("NO HECHA.\n");break;
             case 7:printf("NO HECHA.\n");break;
         }
