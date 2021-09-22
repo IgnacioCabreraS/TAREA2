@@ -7,7 +7,7 @@
 #include "list.h"
 
 typedef struct{
-    const char * nombre;
+    char * nombre;
     const char * marca;
     const char * sector;
     int stock;
@@ -18,8 +18,6 @@ typedef struct{
     const char * nombreCarro;
     int cantidadProductos;
 }carroCompras;
-
-
 
 int is_equal_int(void * key1, void * key2) {
     if(*(int*)key1 == *(int*)key2) return 1;
@@ -139,7 +137,6 @@ Map * cargarPorMarca(FILE * file, Map * mapa){
             }
         }
         
-
         cont++; 
         if(cont == 100) break;
     } 
@@ -183,7 +180,28 @@ Map * cargarPorTipo(FILE * file, Map * map){
     
 }
 
-void buscarPorTipo(Map * mapTipo){
+void annadirEnMapas(Map * mapa, char * nombreProducto, char * nombreMoP, Producto * nuevoP){
+    const char * M;
+    char * MoPEntrante = nombreMoP;
+    M = searchMap(mapa,MoPEntrante);
+                
+    if(M == NULL){
+        List * lista = createList();
+        nuevoP->nombre = nombreProducto;
+        //printf("%s \n", marcaEntrante);
+        pushFront(lista,nuevoP);
+        insertMap(mapa,MoPEntrante,lista);
+    }
+    else{
+        //printf("SE REPITE MARCA \n");
+        List * L = (List*)searchMap(mapa,MoPEntrante);
+        nuevoP->nombre = nombreProducto;
+        pushFront(L,nuevoP);
+    }
+
+}
+
+void buscarPorTipo(Map * mapTipo, Map * mapaNombre){
 
     char * nombre = (char*) malloc(70*sizeof(char));
     printf("Ingrese el tipo de producto deseado : ");
@@ -194,7 +212,13 @@ void buscarPorTipo(Map * mapTipo){
     if(L){
         Producto * P = firstList(L);
         while(P != NULL){
-            printf("%s \n", P->nombre);
+            
+            printf("%s ,", P->nombre);
+            Producto * datos = (Producto*)searchMap(mapaNombre,P->nombre);
+            printf("%s ,", datos->marca);
+            printf("%s ,", datos->sector);
+            printf("%d ,", datos->stock);
+            printf("%d \n", datos->precio);
             P = nextList(L);
             if(!L)break;
         }
@@ -206,17 +230,24 @@ void buscarPorTipo(Map * mapTipo){
     
 }
 
-void buscarPorMarca(Map * mapMarcas){
+void buscarPorMarca(Map * mapMarcas, Map * mapaNombre){
 
     char * nombre = (char*) malloc(70*sizeof(char));
-    printf("Ingrese la marca del producto : ");
+    printf("Ingrese la marca del producto: ");
     scanf(" %[^\n]s]", nombre);
     List * L;
     L = searchMap(mapMarcas,nombre);
+    
     if(L){
         Producto * P = firstList(L);
         while(P != NULL){
-            printf("%s \n", P->nombre);
+            
+            printf("%s ,", P->nombre);
+            Producto * datos = (Producto*)searchMap(mapaNombre,P->nombre);
+            printf("%s ,", datos->marca);
+            printf("%s ,", datos->sector);
+            printf("%d ,", datos->stock);
+            printf("%d \n", datos->precio);
             P = nextList(L);
             if(!L)break;
         }
@@ -228,7 +259,27 @@ void buscarPorMarca(Map * mapMarcas){
     
 }
 
-void agregar(Map * map){
+void buscarNombre(Map * map){
+
+    char * nombre = (char*) malloc(70*sizeof(char));
+    printf("Ingrese el nombre del producto : ");
+    scanf(" %[^\n]s]", nombre);
+    Producto * P;
+    P = searchMap(map,nombre);
+    if(P){
+        printf("%s ,", P->nombre);
+        printf("%s ,", P->marca);
+        printf("%s ,", P->sector);
+        printf("%d ,", P->stock);
+        printf("%d \n", P->precio);
+
+    }else{
+        printf("No existe este producto.\n");
+    }
+    
+}
+
+void agregarProducto(Map * mapaNombres, Map * mapaMarcas, Map * mapaTipos){
 
     Producto * P = (Producto*)malloc(sizeof(Producto));
     // entrada de datos;
@@ -236,7 +287,7 @@ void agregar(Map * map){
     printf("Ingrese el nombre del producto : ");
     scanf(" %[^\n]s]", nombre);
     
-    P = searchMap(map,nombre);
+    P = searchMap(mapaNombres,nombre);
     if(P){
         printf("Este producto ya existe, aumentando stock.\n"); 
         (P->stock)++;
@@ -268,29 +319,16 @@ void agregar(Map * map){
         nuevoP->precio = precio;
         nuevoP->stock = 1;
 
-        insertMap (map, (void *) nuevoP -> nombre, nuevoP);
+        insertMap(mapaNombres, (void *)nuevoP->nombre, nuevoP);
+        annadirEnMapas(mapaMarcas, nombre, marca, nuevoP);
+        annadirEnMapas(mapaTipos, nombre, sector, nuevoP);
 
         printf("Producto agregado. \n");
         
     }
-
 }
 
-void buscarNombre(Map * map){
 
-    char * nombre = (char*) malloc(70*sizeof(char));
-    printf("Ingrese el nombre del producto : ");
-    scanf(" %[^\n]s]", nombre);
-    Producto * P;
-    P = searchMap(map,nombre);
-    if(P){
-        printf("%s \n", P->nombre);
-        
-    }else{
-        printf("No existe este producto.\n");
-    }
-    
-}
 
 void mostrarTodo(Map* map){
 
@@ -364,7 +402,7 @@ int main(){
     mapaPorTipo = importarPorTipo();
 
     int opcion=1;
-    printf("============== SUPERMERCADO MAYORISTA 11 =============\n");
+    printf("============== SUPERMERCADO =============\n");
 
     while(opcion!=0){
         printf("1. Agregar producto.\n");
@@ -374,13 +412,13 @@ int main(){
         printf("5. Mostrar todos los productos.\n");
         printf("6. Agregar producto a carrito.\n");
         printf("7. Concretar compra.\n");
-        printf("0. Salir del acuenta.\n");
+        printf("0. Salir.\n");
         scanf("%d",&opcion);
 
         switch(opcion){
-            case 1:agregar(mapaPorNombre);break;
-            case 2:buscarPorTipo(mapaPorTipo);break;
-            case 3:buscarPorMarca(mapaPorMarca);break;
+            case 1:agregarProducto(mapaPorNombre,mapaPorMarca,mapaPorTipo);break;
+            case 2:buscarPorTipo(mapaPorTipo,mapaPorNombre);break;
+            case 3:buscarPorMarca(mapaPorMarca,mapaPorNombre);break;
             case 4:buscarNombre(mapaPorNombre);break;
             case 5:mostrarTodo(mapaPorNombre);break;
             case 6:printf("NO HECHA.\n");break;
