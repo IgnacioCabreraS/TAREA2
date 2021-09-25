@@ -26,7 +26,7 @@ typedef struct{
     char * sector;
     int stock;
     int precio;
-}Producto;
+}producto;
 
 typedef struct{
     char * nombreCarro;
@@ -70,6 +70,9 @@ int main(){
     return 0;
 }
 
+/*
+    En esta funcion leemos el archivo csv, este lo utilizamos para cargar los mapas dejando dentro de este los datos correspondientes.
+*/
 Map * importar(Map * mapaGeneral, Map * mapaPorMarca, Map * mapaPorSector){
     char archivo[101];
     char archivo2[101];
@@ -96,6 +99,9 @@ Map * importar(Map * mapaGeneral, Map * mapaPorMarca, Map * mapaPorSector){
     fclose(file2);
     fclose(file3);
 }
+/*
+  funcion para comparar claves de tipo string retorna 1 si son iguales
+*/
 
 int isEqualString(void * key1, void * key2){
     if(strcmp((char*)key1, (char*)key2)==0) return 1;
@@ -151,7 +157,7 @@ Map * cargarPorNombre(FILE * file, Map * mapa){
     int cont = 0;
 
     while (fgets (lineaArchivo, 1024, file) != NULL) {
-        Producto * productos = (Producto*) malloc (sizeof(Producto));
+        producto * productos = (producto*) malloc (sizeof(producto));
         
         for(i = 0; i <= 4; i++){
             const char * aux = get_csv_field(lineaArchivo, i);
@@ -196,7 +202,7 @@ Map * cargarPorMarca(FILE * file, Map * mapa){
     int cont = 0;
     // recorremos el archivo csv por linea
     while (fgets (lineaArchivo, 1024, file) != NULL) {
-        Producto * producto = (Producto*)malloc(sizeof(Producto));
+        producto * productos = (producto*)malloc(sizeof(producto));
         
         for(i = 0; i <= 4; i++){
             const char * aux = get_csv_field(lineaArchivo, i);
@@ -210,15 +216,15 @@ Map * cargarPorMarca(FILE * file, Map * mapa){
 
                 if(M == NULL){//No existe la marca, por lo que se inserta como key la marca y el valor la lista con el producto.
                     List * listaMarcas = createList();
-                    producto->nombre = get_csv_field(lineaArchivo, 0);
-                    pushFront(listaMarcas,producto); 
+                    productos->nombre = get_csv_field(lineaArchivo, 0);
+                    pushFront(listaMarcas,productos); 
                     insertMap(mapa,marcaEntrante,listaMarcas);
                 }
                 else{ // si la marca ya existe adicionamos el nombre producto dentro de la lista del mapa (mapa por marca).
                     
                     List * L = (List*)searchMap(mapa,marcaEntrante);
-                    producto->nombre = get_csv_field(lineaArchivo, 0);
-                    pushFront(L,producto);
+                    productos->nombre = get_csv_field(lineaArchivo, 0);
+                    pushFront(L,productos);
                 }
             }
         }
@@ -240,7 +246,7 @@ Map * cargarPorSector(FILE * file, Map * map){
     int cont = 0;
     // recorremos el archivo csv por linea
     while (fgets (lineaArchivo, 1024, file) != NULL) {
-        Producto * producto = (Producto*)malloc(sizeof(Producto));
+        producto * productos = (producto*)malloc(sizeof(producto));
         
         for(i = 0; i <= 4; i++){
             const char * aux = get_csv_field(lineaArchivo, i);
@@ -254,15 +260,15 @@ Map * cargarPorSector(FILE * file, Map * map){
 
                 if(M == NULL){ //No existe el sector , por lo que se  inserta como key el sectro y el valor la lista con el producto
                     List * listaSector = createList();
-                    producto->nombre = get_csv_field(lineaArchivo, 0);
-                    pushFront(listaSector,producto);
+                    productos->nombre = get_csv_field(lineaArchivo, 0);
+                    pushFront(listaSector,productos);
                     insertMap(map,sectorEntrante,listaSector);
                 }
                 else{ // en el caso de que ya exista solo adicionamos el nombre del producto dentro de la lista del mapa (mapa por sector).
                     
                     List * L = (List*)searchMap(map,sectorEntrante);
-                    producto->nombre = get_csv_field(lineaArchivo, 0); // obtenemos el nombre del producto.
-                    pushFront(L,producto);// insertamos el nombre del producto en la lista
+                    productos->nombre = get_csv_field(lineaArchivo, 0); // obtenemos el nombre del producto.
+                    pushFront(L,productos);// insertamos el nombre del producto en la lista
                 }
             }
         }
@@ -273,7 +279,7 @@ Map * cargarPorSector(FILE * file, Map * map){
 
 //Funcion para poder añadir las marcas o sectores a sus respectivos mapas donde la key es el nombre de la marca o sector
 // y el value una lista con los productos.
-void annadirEnMapas(Map * mapa, char * nombreProducto, char * nombreMoS, Producto * nuevoP){
+void annadirEnMapas(Map * mapa, char * nombreProducto, char * nombreMoS, producto * nuevoP){
     const char * M;
     char * MoSEntrante = nombreMoS; // char que guarda la marca o el sector.
 
@@ -305,11 +311,11 @@ void buscarPorSector(Map * mapSector, Map * mapaGeneral){
     L = searchMap(mapSector,nombre);
 
     if(L){
-        Producto * P = firstList(L);
+        producto * P = firstList(L);
         while(P != NULL){
             
             printf("%s ,", P->nombre);
-            Producto * datos = (Producto*)searchMap(mapaGeneral,P->nombre);
+            producto * datos = (producto*)searchMap(mapaGeneral,P->nombre);
             printf("%s ,", datos->marca);
             printf("%s ,", datos->sector);
             printf("%d ,", datos->stock);
@@ -337,11 +343,11 @@ void buscarPorMarca(Map * mapMarcas, Map * mapaGeneral){
     L = searchMap(mapMarcas,nombre);
     
     if(L){
-        Producto * P = firstList(L);
+        producto * P = firstList(L);
         while(P != NULL){
             
             printf("%s ,", P->nombre);
-            Producto * datos = (Producto*)searchMap(mapaGeneral,P->nombre);
+            producto * datos = (producto*)searchMap(mapaGeneral,P->nombre);
             printf("%s ,", datos->marca);
             printf("%s ,", datos->sector);
             printf("%d ,", datos->stock);
@@ -365,7 +371,7 @@ void buscarNombre(Map * mapaGeneral){
     char * nombre = (char*) malloc(70*sizeof(char));
     printf("Ingrese el nombre del producto : ");
     scanf(" %[^\n]s]", nombre);
-    Producto * P;
+    producto * P;
     P = searchMap(mapaGeneral,nombre);
     if(P != NULL){
         printf("%s ,", P->nombre);
@@ -383,18 +389,20 @@ void buscarNombre(Map * mapaGeneral){
 /* 
     Esta función lo que hace es agrega el producto el cual se ingresa el nombre del producto, si aquel producto existe se aumenta el 
     stock, en caso contrario se pide todos lo datos del producto y agrega el producto con sus respectivos datos. Este producto a la vez
-    se agrega en todo los mapas:  mapa general, mapa marcas y mara tipos.
+    se agrega en todo los mapas:  mapa general, mapa marcas y mapa tipos.
 */
 
 void agregarProducto(Map * mapaGeneral, Map * mapaMarcas, Map * mapaTipos){
 
-    Producto * P = (Producto*)malloc(sizeof(Producto));
-    // entrada de datos;
+    producto * P = (producto*)malloc(sizeof(producto));
+    //Se pide el nombre del producto
     char * nombre = (char*) malloc(30*sizeof(char));
     printf("Ingrese el nombre del producto : ");
     scanf(" %[^\n]s]", nombre);
     
+    //Se revisa si este existe o no, si existe se aumenta el stock, sino se agrega.
     P = searchMap(mapaGeneral,nombre);
+
     if(P != NULL){
         printf("Este producto ya existe, aumentando stock.\n"); 
         (P->stock)++;
@@ -402,10 +410,10 @@ void agregarProducto(Map * mapaGeneral, Map * mapaMarcas, Map * mapaTipos){
     }
     else{
         
-        Producto *nuevoP = (Producto *) malloc (sizeof (Producto));
+        producto *nuevoP = (producto *) malloc (sizeof (producto));
 
         printf("Este producto no existe, agregue datos.\n"); 
-
+        // Solicitamos las especificaciones del producto
         char * marca = (char*) malloc(30*sizeof(char));
         printf("Marca: ");
         scanf(" %[^\n]s]", marca);
@@ -422,8 +430,9 @@ void agregarProducto(Map * mapaGeneral, Map * mapaMarcas, Map * mapaTipos){
         nuevoP->marca = marca;
         nuevoP->sector = sector;
         nuevoP->precio = precio;
-        nuevoP->stock = 1;
+        nuevoP->stock = 1; // inicializamos el stock en 1 porque es un producto nuevo
 
+        //A los mapas como, mapa general, mapa marcas y mapa tipos
         insertMap(mapaGeneral, (void *)nuevoP->nombre, nuevoP);
 
         annadirEnMapas(mapaMarcas, nombre, marca, nuevoP);
@@ -439,8 +448,10 @@ void agregarProducto(Map * mapaGeneral, Map * mapaMarcas, Map * mapaTipos){
 */
 void mostrarTodo(Map* mapaGeneral){
 
-    Producto *P = firstMap(mapaGeneral);
+    //Se coloca el primer elemento del mapa general
+    producto *P = firstMap(mapaGeneral);
 
+    //Y se muestra por pantalla, pasando al siguiente elemento hasta terminar el mapa
     while(P != NULL){
         printf("%s, ", P->nombre);
         printf("%s, ", P->marca);
@@ -452,13 +463,10 @@ void mostrarTodo(Map* mapaGeneral){
 }
 
 /*
-    La funcion "agregarACarro" en primer lugar pide el nombre para el carrito de compra, revisa si este carrito esta en el mapa
-    de carritos o no, si no esta se crea un carrito con ese nombre, pero si esta se ingresa a este mismo y se trabaja ahi. Luego
-    se pide el nombre del producto a ingresar, se verifica si este esta en el mapa general o no, si no lo esta se muestra un 
-    mensaje por pantalla y se sale de la funcion, pero ahora bien, si el producto esta en el mapa general, finalemnte se realiza
-    la ultima verificacion de si el producto ya esta en el carrito de compra o no, si no lo esta se agrega a este
-    y se borra el stock del producto del mapa general y el producto del mapa marcas y mapa sector, pero si el 
-    producto ya esta en el carro solamente se aumenta el stock y se realizanlas eliminaciones anteriormente mencionadas
+    La funcion "agregarACarro" pide el nombre del carro, verifica si este existe, si no existe se crea uno pero si existe
+    se trabaja ahi mismo. Luego se pide el nombre del producto, se revisa si esta en el mapa general, si es asi se agrega
+    al carro elminando el stock del mapa general y del producto del mapa marcas y mapa stock, si no muestra un mensaje por
+    pantalla y acaba el programa
 */
 void agregarACarro(Map * mapaGeneral, Map * mapaCarritos, Map * mapaPorSector, Map * mapaPorMarca){
     char * nuevoNombreCarro = (char*) malloc(30*sizeof(char));
@@ -477,16 +485,16 @@ void agregarACarro(Map * mapaGeneral, Map * mapaCarritos, Map * mapaPorSector, M
         scanf(" %[^\n]s]", nuevoProducto);
         
         //SE BUSCA EN EL MAPA GENERAL SI EXISTE
-        Producto * P = (Producto*)malloc(sizeof(Producto));
+        producto * P = (producto*)malloc(sizeof(producto));
         P = searchMap(mapaGeneral,nuevoProducto);
 
         if(P != NULL){
             printf("Producto existe en mapa general\n");
             List * L = (List*)searchMap(mapaCarritos,nuevoNombreCarro);
-            Producto * productoGeneral = (Producto*)malloc(sizeof(Producto));
-            productoGeneral = firstList(L); // PRODUCTO QUE ESTÁ EN LA LISTA DEL CARRO
+            producto * productoListaCarrito = (producto*)malloc(sizeof(producto));
+            productoListaCarrito = firstList(L); // PRODUCTO QUE ESTÁ EN LA LISTA DEL CARRO
 
-            Producto * productoParaCarro = (Producto*)malloc(sizeof(Producto));
+            producto * productoParaCarro = (producto*)malloc(sizeof(producto));
             productoParaCarro->nombre = P->nombre;
             productoParaCarro->marca = P->marca;
             productoParaCarro->sector = P->sector;
@@ -494,12 +502,12 @@ void agregarACarro(Map * mapaGeneral, Map * mapaCarritos, Map * mapaPorSector, M
             
 
             //VERIFICAR SI EL PRODUCTO YA EXISTE EN LA LISTA DEL CARRO
-            while(productoGeneral != NULL){
-                if(strcmp(productoGeneral->nombre, nuevoProducto) == 0){
+            while(productoListaCarrito != NULL){
+                if(strcmp(productoListaCarrito->nombre, nuevoProducto) == 0){
                     printf("Producto ya existe en el carro.\n");
                     
                     //EN ESTE PUNTO, EXISTE EN MAPA GENERAL Y MAPA DEL CARRO.
-                    productoGeneral->stock += 1;
+                    productoListaCarrito->stock += 1;
                     P->stock--;
                     if(P->stock <= 0){
 
@@ -508,32 +516,32 @@ void agregarACarro(Map * mapaGeneral, Map * mapaCarritos, Map * mapaPorSector, M
                         // ELIMINANDO PRODUCTOS DE MAPA POR MARCA
                         List * L;
                         L = searchMap(mapaPorMarca,P->marca);
-                        Producto * A = firstList(L);
+                        producto * productoMapaMarcas = firstList(L);
 
-                        while(A != NULL){
+                        while(productoMapaMarcas != NULL){
                             
-                            if(strcmp(P->nombre,A->nombre) == 0){
+                            if(strcmp(P->nombre,productoMapaMarcas->nombre) == 0){
                                 popCurrent(L);
                                 break;
                             }
                                     
-                            A = nextList(L);
+                            productoMapaMarcas = nextList(L);
                             if(L == NULL)break;
                         }
                         // ELIMINANDO PRODUCTOS DE MAPA POR SECTOR/TIPO
 
                         List * L2;
                         L2 = searchMap(mapaPorSector,P->sector);
-                        Producto * B = firstList(L2);
+                        producto * productoMapaSector = firstList(L2);
 
-                        while(B != NULL){
+                        while(productoMapaSector != NULL){
                             
-                            if(strcmp(P->nombre,B->nombre) == 0){
+                            if(strcmp(P->nombre,productoMapaSector->nombre) == 0){
                                 popCurrent(L2);
                                 break;
                             }
                                     
-                            B = nextList(L2);
+                            productoMapaSector = nextList(L2);
                             if(L2 == NULL)break;
                         }
 
@@ -541,13 +549,13 @@ void agregarACarro(Map * mapaGeneral, Map * mapaCarritos, Map * mapaPorSector, M
                         eraseMap(mapaGeneral,P->nombre);
                         break;
                     }else{
-                        productoGeneral++;
+                        productoListaCarrito++;
                         printf("Producto del carro aumentado en stock.\n");
                         break;
                     }
                 }
-                productoGeneral = nextList(L);
-                if(productoGeneral == NULL){
+                productoListaCarrito = nextList(L);
+                if(productoListaCarrito == NULL){
                     printf("Producto no existe en el carro.\n");
                     pushFront(L,productoParaCarro);
                     printf("Producto annadido al carro.\n");
@@ -570,13 +578,13 @@ void agregarACarro(Map * mapaGeneral, Map * mapaCarritos, Map * mapaPorSector, M
         scanf(" %[^\n]s]", nuevoProducto);
         
         //BUSQUEDA DE PRODUCTO INGRESADO EN MAPA GENERAL
-        Producto * P = (Producto*)malloc(sizeof(Producto));
+        producto * P = (producto*)malloc(sizeof(producto));
         P = searchMap(mapaGeneral,nuevoProducto);
         
         if(P != NULL){//EXISTE EL PRODUCTO
             
             List * L = createList();
-            Producto * productoParaCarro = (Producto*)malloc(sizeof(Producto));
+            producto * productoParaCarro = (producto*)malloc(sizeof(producto));
             productoParaCarro->nombre = P->nombre;
             productoParaCarro->marca = P->marca;
             productoParaCarro->sector = P->sector;
@@ -590,32 +598,32 @@ void agregarACarro(Map * mapaGeneral, Map * mapaCarritos, Map * mapaPorSector, M
                 // ELIMINANDO PRODUCTOS DE MAPA POR MARCA
                 List * L;
                 L = searchMap(mapaPorMarca,P->marca);
-                Producto * A = firstList(L);
+                producto * productoMapaMarcas = firstList(L);
 
-                while(A != NULL){
+                while(productoMapaMarcas != NULL){
                     
-                    if(strcmp(P->nombre,A->nombre) == 0){
+                    if(strcmp(P->nombre,productoMapaMarcas->nombre) == 0){
                         popCurrent(L);
                         break;
                     }
                             
-                    A = nextList(L);
+                    productoMapaMarcas = nextList(L);
                     if(L == NULL)break;
                 }
                 // ELIMINANDO PRODUCTOS DE MAPA POR SECTOR/TIPO
 
                 List * L2;
                 L2 = searchMap(mapaPorSector,P->sector);
-                Producto * B = firstList(L2);
+                producto * productoMapaSector = firstList(L2);
 
-                while(B != NULL){
+                while(productoMapaSector != NULL){
                     
-                    if(strcmp(P->nombre,B->nombre) == 0){
+                    if(strcmp(P->nombre,productoMapaSector->nombre) == 0){
                         popCurrent(L2);
                         break;
                     }
                             
-                    B = nextList(L2);
+                    productoMapaSector = nextList(L2);
                     if(L2 == NULL)break;
                 }
 
@@ -636,9 +644,9 @@ void agregarACarro(Map * mapaGeneral, Map * mapaCarritos, Map * mapaPorSector, M
     }
 }
 /*
-    La funcion "concretarCompraCarrito" pide el nombre del carrito, verifica si este carrito existe, si este no existe, se muestra
-    un mensaje por pantalla y se sale de la funcion, en cambio si existe se muestran por pantalla los productos, la cantidad y
-    el precio ademas del precio total para finalmente preguntar si desea el usuario desea efectuar la compra
+    La funcion "concretarCompraCarrito" recibe el nombre de un carrito, comprueba si este existe, si no es asi muestra un mensaje
+    por pantalla y se sale de la funcion, en cambio si es asi, muestra por pantalla los productos del carrito junto con su precio,
+    cantidad y el precio total, para por ultimo preguntar al usuario si efectuara la compra
 */
 void concretarCompraCarrito(Map* mapaCarros){
 
@@ -655,7 +663,7 @@ void concretarCompraCarrito(Map* mapaCarros){
 
         //Obtenemos la lista que contienen los productos del carro.
         List * L = (List*)searchMap(mapaCarros,carro);
-        Producto * productosCarro = (Producto*)malloc(sizeof(Producto));
+        producto * productosCarro = (producto*)malloc(sizeof(producto));
         productosCarro = firstList(L);
         int totalPago=0;
         int totalProductos=0;
@@ -670,7 +678,7 @@ void concretarCompraCarrito(Map* mapaCarros){
             printf("%d \n", productosCarro->precio);
             
             //Se guarda el total de productos y el total a pagar por cada iteracion.
-            totalPago == totalPago + (productosCarro->precio * productosCarro->stock);
+            totalPago += totalPago + (productosCarro->precio * productosCarro->stock);
             totalProductos = totalProductos + productosCarro->stock;
             
             //Se pasa al siguiente producto de la lista del carro.
@@ -702,13 +710,13 @@ void concretarCompraCarrito(Map* mapaCarros){
 }
 
 /*
-    La funcion "exportarProductos" pide un nombre para crear un nuevo archivo ".csv" al cual se le pasaran todos los productos con
-    detalle (stock, marca etc) del mapa general
+    La funcion "exportarProductos" crea nuevo archivo ".csv" en donde iran todos los datos del mapa general
 */
 void exportarProductos (Map * mapaGeneral){
     char * nombreArchivo = (char*) malloc(30*sizeof(char));
     FILE * nuevoFile;
 
+    //Se pide el nombre para el nuevo archivo ".csv"
     do{
         printf("Ingrese el nombre de su nuevo archivo .csv: ");
         scanf(" %[^\n]s", nombreArchivo);
@@ -717,13 +725,15 @@ void exportarProductos (Map * mapaGeneral){
         }
     }while(nombreArchivo == "Productos");
     
+    //Se muestra por pantalla el nombre del archivo
     printf("Nombre de su archivo: %s.csv\n",nombreArchivo);
     
     nombreArchivo = strcat(nombreArchivo,".csv"); 
     nuevoFile=fopen(nombreArchivo,"w+");
-    Producto * P = (Producto*)malloc(sizeof(Producto));
+    producto * P = (producto*)malloc(sizeof(producto));
     P = firstMap(mapaGeneral);
     
+    //Se imprime todos los datos del mapa general en el nuevo archivo ".csv"
     while(P!=NULL){
         
         fprintf(nuevoFile,"%s,%s,%s,%d,%d\n",P->nombre,P->marca,P->sector,P->stock,P->precio);
