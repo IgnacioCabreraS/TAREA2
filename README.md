@@ -1,2 +1,2 @@
 # Tarea2
- Supermercado acuenta
+Supermercado acuenta

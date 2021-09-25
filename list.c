@@ -72,7 +72,7 @@ void pushFront(List * list, const void * data) {
         list->head->prev = new;
     }
     
-    list->head = new;
+    list->head= new;
 }
 
 void pushBack(List * list, const void * data) {
